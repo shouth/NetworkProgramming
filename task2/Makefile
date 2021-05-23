@@ -10,5 +10,8 @@ libmynet.a : ${OBJS}
 
 ${OBJS}: mynet.h
 
+task2 : task2.c libmynet.a
+	gcc task2.c libmynet.a -o $@
+
 clean:
 	${RM} *.o

@@ -16,6 +16,9 @@ int init_tcpserver(in_port_t myport, int backlog)
     exit_errmesg("socket()");
   }
 
+  int option = 1;
+  setsockopt(sock_listen, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
+
   /* 待ち受け用のソケットに自分自身のアドレス情報を結びつける */
   if(bind(sock_listen, (struct sockaddr *)&my_adrs, sizeof(my_adrs)) == -1 ){
     exit_errmesg("bind()");
