@@ -11,7 +11,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#define PROXYPORT 8080 /* プロキシサーバのポート番号 */
+#define PROXYPORT 50000 /* プロキシサーバのポート番号 */
 #define BUFSIZE 102400 /* バッファサイズ */
 
 int main(int argc, char **argv)
@@ -21,7 +21,7 @@ int main(int argc, char **argv)
 
     int tcpsock;
 
-    char proxyname[] = "proxy.cis.kit.ac.jp"; /* プロキシサーバ */
+    char proxyname[] = "localhost"; /* プロキシサーバ */
     char k_buf[BUFSIZE], s_buf[BUFSIZE], r_buf[BUFSIZE];
     int strsize;
 
