@@ -11,7 +11,7 @@ libmynet.a : ${OBJS}
 ${OBJS}: mynet/mynet.h
 
 task% : libmynet.a
-	gcc $@/$@.c mynet/libmynet.a -o $@/$@ -Imynet
+	gcc $@/$@.c mynet/libmynet.a -o $@.out -Imynet
 
 clean:
 	${RM} mynet/*.o
