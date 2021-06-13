@@ -1,7 +1,12 @@
 #
 # Makefile for libmynet
 #
-OBJS = mynet/init_tcpserver.o mynet/init_tcpclient.o mynet/other.o
+OBJS = \
+	mynet/init_tcpserver.o \
+	mynet/init_tcpclient.o \
+	mynet/init_udpserver.o \
+	mynet/init_udpclient.o \
+	mynet/other.o
 AR = ar -qc
 
 libmynet.a : ${OBJS}
