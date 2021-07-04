@@ -10,13 +10,13 @@ OBJS = \
 AR = ar -qc
 
 libmynet.a : ${OBJS}
-	${RM} $@
+	${RM} mynet/$@
 	${AR} mynet/$@ ${OBJS}
 
 ${OBJS}: mynet/mynet.h
 
 task% : libmynet.a
-	gcc $@/$@.c mynet/libmynet.a -o $@.out -Imynet -pthread
+	gcc $@/$@.c -Lmynet -lmynet -o $@.out -Imynet -pthread
 
 clean:
 	${RM} mynet/*.o

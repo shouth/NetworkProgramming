@@ -3,7 +3,7 @@
 
 #include "mynet.h"
 
-void exit_errmesg(char *errmesg)
+void exit_errmesg(const char *errmesg)
 {
     perror(errmesg);
     exit(EXIT_FAILURE);
