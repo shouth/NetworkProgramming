@@ -134,7 +134,7 @@ static void proc_client(server_context *cxt, client_info *info)
     if (strncmp(buf, "JOIN", 4) == 0) {
         LOG_TRACE("JOIN; user = %s", buf + 5);
         if (strlen(buf + 5) > 15) {
-            LOG_INFO("User %15s... tried to JOIN, but server refused because name of this user is greater than 15 characters.", buf + 5);
+            LOG_INFO("User %.15s... tried to JOIN, but server refused because name of this user is greater than 15 characters.", buf + 5);
             free_client_info(cxt, info);
             return;
         }
