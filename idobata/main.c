@@ -25,7 +25,7 @@ static void show_help(const char *command_name)
         "  %s -u <user-name> [-p <port-number>] [-l <log-level>] [-C] [-h]\n"
         "\n"
         "OPTIONS\n"
-        "  -u <user-name>    User name to use\n"
+        "  -u <user-name>    User name\n"
         "  -p <port-number>  Port number of server. Default to 50001\n"
         "  -l <log-level>    Log level. Default to INFO\n"
         "  -C                Disable output color\n"
