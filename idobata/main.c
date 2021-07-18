@@ -149,7 +149,7 @@ int main(int argc, char **argv)
     LOG_INFO("Finding server...");
     struct sockaddr_in server_addr;
     if (idobata_lookup(port, (struct sockaddr *) &server_addr) != -1) {
-        LOG_INFO("Server found. IP address of server is %s", inet_ntoa(server_addr.sin_addr));
+        LOG_INFO("Server found. Server IP address = %s", inet_ntoa(server_addr.sin_addr));
         LOG_INFO("Running as client.");
         idobata_client((struct sockaddr *) &server_addr, username);
     } else {
