@@ -3,7 +3,7 @@
 
 #define BUFSIZE 1024
 
-int idobata_join(int sock, const char *name)
+static int idobata_join(int sock, const char *name)
 {
     LOG_TRACE("JOIN; username = %s", name);
 
@@ -12,7 +12,7 @@ int idobata_join(int sock, const char *name)
     return send(sock, buf, size, 0);
 }
 
-void idobata_mesg(const char *msg)
+static void idobata_mesg(const char *msg)
 {
     LOG_TRACE("MESG; message = %s", msg + 5);
 
@@ -20,7 +20,7 @@ void idobata_mesg(const char *msg)
     fflush(stdout);
 }
 
-int idobata_post(int sock, const char *msg)
+static int idobata_post(int sock, const char *msg)
 {
     LOG_TRACE("POST; message = %s", msg);
 
@@ -29,7 +29,7 @@ int idobata_post(int sock, const char *msg)
     return send(sock, buf, size, 0);
 }
 
-int idobata_quit(int sock)
+static int idobata_quit(int sock)
 {
     LOG_TRACE("QUIT;");
 

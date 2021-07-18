@@ -3,15 +3,15 @@
 
 #include <stddef.h>
 
-typedef struct {
-    list_node *prev;
-    list_node *next;
+typedef struct list_node {
+    struct list_node *prev;
+    struct list_node *next;
 } list_node;
 
 #define list_new(name) { &(name), &(name) }
 #define list_entry(ptr, type, member) ((type *) ((char *) (ptr) - (char *) &((type *) 0)->member))
 
-void list_insert(list_node *dest, list_node *node)
+static void list_insert(list_node *dest, list_node *node)
 {
     if (dest == NULL || node == NULL) return;
     if (dest->next != NULL) dest->next->prev = node;
@@ -20,7 +20,7 @@ void list_insert(list_node *dest, list_node *node)
     node->prev = dest;
 }
 
-void list_remove(list_node *node)
+static void list_remove(list_node *node)
 {
     if (node->prev != NULL) node->prev->next = node->next;
     if (node->next != NULL) node->next->prev = node->prev;

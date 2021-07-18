@@ -10,12 +10,16 @@
 #include "mynet.h"
 #include "logger.h"
 #include "idobata_client.h"
+#include "idobata_server.h"
 
-#define S_BUFSIZE 512 /* 送信用バッファサイズ */
-#define R_BUFSIZE 512 /* 受信用バッファサイズ */
-#define TIMEOUT_SEC 10
+#define BUFSIZE 1024
 
-static char s_buf[S_BUFSIZE], r_buf[R_BUFSIZE];
+int idobata_helo(int sock, struct sockaddr *addr)
+{
+    char buf[BUFSIZE];
+    size_t strsize = snprintf(buf, BUFSIZE, "HELO");
+    Sendto(sock, buf, strsize, 0, addr, sizeof(struct sockaddr));
+}
 
 int init_broadcast_udpclient(in_addr_t addr, in_port_t port, struct sockaddr_in *ret)
 {
@@ -32,27 +36,47 @@ int init_broadcast_udpclient(in_addr_t addr, in_port_t port, struct sockaddr_in 
     return sock;
 }
 
-int find_server(in_port_t port, const char *user_name)
+int idobata_lookup(in_port_t port, struct sockaddr *server_addr)
 {
-    const char *servername = "172.25.207.171";
-    struct hostent *server_host;
-    struct sockaddr_in server_adrs;
-    int sock;
+    struct sockaddr_in broadcast_addr;
 
-    /* サーバ名をアドレス(hostent構造体)に変換する */
-    if ((server_host = gethostbyname(servername)) == NULL) {
-        exit_errmesg("gethostbyname()");
+    int sock = init_broadcast_udpclient(INADDR_BROADCAST, port, &broadcast_addr);
+
+    fd_set mask, readfds;
+    FD_ZERO(&mask);
+    FD_SET(sock, &mask);
+
+    struct timeval timeout;
+
+    char buf[BUFSIZE];
+
+    for (size_t i = 0; i < 3; i++) {
+        LOG_INFO("[%d/3] Trying to find server...", i + 1);
+
+        idobata_helo(sock, (struct sockaddr *) &broadcast_addr);
+
+        readfds = mask;
+        timeout.tv_sec = 5, timeout.tv_usec = 0;
+
+        if (select(sock + 1, &readfds, NULL, NULL, &timeout) != 0) {
+            if (FD_ISSET(sock, &readfds)) {
+                socklen_t socklen = sizeof(struct sockaddr);
+                size_t strsize = Recvfrom(sock, buf, BUFSIZE, 0, server_addr, &socklen);
+                if (strsize > 0) strsize--;
+                buf[strsize] = '\0';
+
+                if (strncmp(buf, "HERE", 4) == 0) {
+                    close(sock);
+                    return 0;
+                }
+            }
+        } else {
+            LOG_INFO("HELO timeout.");
+        }
     }
 
-    /* サーバの情報をsockaddr_in構造体に格納する */
-    memset(&server_adrs, 0, sizeof(server_adrs));
-    server_adrs.sin_family = AF_INET;
-    server_adrs.sin_port = htons(port);
-    memcpy(&server_adrs.sin_addr, server_host->h_addr_list[0], server_host->h_length);
-
-    idobata_client((struct sockaddr *) &server_adrs, user_name);
-
-    return sock;
+    close(sock);
+    return -1;
 }
 
 int main(int argc, char **argv)
@@ -60,5 +84,15 @@ int main(int argc, char **argv)
     idobata_log_level(TRACE);
     LOG_INFO("Educational Idobata System");
 
-    find_server(50001, "shouth");
+    LOG_INFO("Finding server...");
+    struct sockaddr_in server_addr;
+    if (idobata_lookup(50001, (struct sockaddr *) &server_addr) != -1) {
+        LOG_INFO("Server found. IP address of server is %s", inet_ntoa(server_addr.sin_addr));
+        LOG_INFO("Initiating as client.");
+        idobata_client((struct sockaddr *) &server_addr, "shouth");
+    } else {
+        LOG_INFO("Cannot find server.");
+        LOG_INFO("Initiating as server.");
+        idobata_server(50001, 10, "server");
+    }
 }

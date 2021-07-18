@@ -1,27 +1,28 @@
 #include <time.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
+#include <sys/select.h>
 
 #include "idobata_server.h"
 #include "mynet.h"
 
 #define BUFSIZE 1024
 
-int idobata_here(int sock, struct sockaddr *client_addr)
+static int idobata_here(int sock, struct sockaddr *client_addr)
 {
     char buf[BUFSIZE];
     size_t strsize = snprintf(buf, BUFSIZE, "HERE");
     Sendto(sock, buf, strsize, 0, client_addr, sizeof(struct sockaddr));
 }
 
-int idobata_join(client_info_list *node, const char *name)
+static int idobata_join(client_info_list *node, const char *name)
 {
     client_info *info = list_entry(node, client_info, node);
     info->state = JOINED;
     strncpy(info->name, name, sizeof(info->name));
 }
 
-int idobata_quit(client_info_list *node)
+static int idobata_quit(client_info_list *node)
 {
     client_info *info = list_entry(node, client_info, node);
     list_remove(node);
@@ -29,7 +30,7 @@ int idobata_quit(client_info_list *node)
     free(info);
 }
 
-int idobata_mesg(client_info_list *head, const char *sender, const char *msg, size_t size)
+static int idobata_mesg(client_info_list *head, const char *sender, const char *msg, size_t size)
 {
     char buf[BUFSIZE];
     size_t strsize = snprintf(buf, BUFSIZE, "MESG [%s] %s", sender, msg);
@@ -43,7 +44,7 @@ int idobata_mesg(client_info_list *head, const char *sender, const char *msg, si
     printf("%s", buf + 5);
 }
 
-int idobata_post(client_info_list *node, const char *msg, size_t size)
+static int idobata_post(client_info_list *node, const char *msg, size_t size)
 {
     client_info *info = list_entry(node, client_info, node);
     idobata_mesg(node, info->name, msg + 5, size - 5);
@@ -89,7 +90,7 @@ int idobata_server(in_port_t port, size_t capacity, const char *username)
             buf[strsize] = '\0';
 
             if (strncmp(buf, "HELO", 4) == 0) {
-                idobata_here(udp_sock, &addr);
+                idobata_here(udp_sock, (struct sockaddr *) &addr);
             }
         }
 
@@ -118,7 +119,7 @@ int idobata_server(in_port_t port, size_t capacity, const char *username)
                 }
 
                 if (strncmp(buf, "POST", 4) == 0) {
-                    idobata_post(info, buf, strsize);
+                    idobata_post(node, buf, strsize);
                 }
 
                 if (strncmp(buf, "QUIT", 4) == 0) {
@@ -137,9 +138,9 @@ int idobata_server(in_port_t port, size_t capacity, const char *username)
             } else {
                 time_t elapsed = time(NULL) - info->last_update;
                 if (info->state == JOINING) {
-                    if (elapsed > 60 * 5) idobata_quit(info);
+                    if (elapsed > 60 * 5) idobata_quit(node);
                 } else {
-                    if (elapsed > 60 * 30) idobata_quit(info);
+                    if (elapsed > 60 * 30) idobata_quit(node);
                 }
             }
         }
