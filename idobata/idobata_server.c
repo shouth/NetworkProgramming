@@ -52,7 +52,7 @@ static int idobata_mesg(client_info_list *head, client_info_list *sender, const 
         send(info->sock, buf, strsize, 0);
     }
 
-    printf("%s\n", buf + 5);
+    if (sender != head) printf("%s\n", buf + 5);
 }
 
 static int idobata_post(client_info_list *head, client_info_list *sender, const char *msg, size_t size)
