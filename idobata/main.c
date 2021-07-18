@@ -51,27 +51,29 @@ int idobata_lookup(in_port_t port, struct sockaddr *server_addr)
     char buf[BUFSIZE];
 
     for (size_t i = 0; i < 3; i++) {
-        LOG_INFO("[%d/3] Trying to find server...", i + 1);
+        LOG_DEBUG("[%d/3] Trying to find server...", i + 1);
 
         idobata_helo(sock, (struct sockaddr *) &broadcast_addr);
 
         readfds = mask;
-        timeout.tv_sec = 5, timeout.tv_usec = 0;
+        timeout.tv_sec = 1, timeout.tv_usec = 0;
 
         if (select(sock + 1, &readfds, NULL, NULL, &timeout) != 0) {
             if (FD_ISSET(sock, &readfds)) {
                 socklen_t socklen = sizeof(struct sockaddr);
                 size_t strsize = Recvfrom(sock, buf, BUFSIZE, 0, server_addr, &socklen);
-                if (strsize > 0) strsize--;
                 buf[strsize] = '\0';
 
+                LOG_TRACE("Received from server: %s", buf);
                 if (strncmp(buf, "HERE", 4) == 0) {
                     close(sock);
                     return 0;
+                } else {
+                    LOG_DEBUG("Server responded, but payload is ill-formed.");
                 }
             }
         } else {
-            LOG_INFO("HELO timeout.");
+            LOG_DEBUG("HELO timeout.");
         }
     }
 
@@ -88,11 +90,11 @@ int main(int argc, char **argv)
     struct sockaddr_in server_addr;
     if (idobata_lookup(50001, (struct sockaddr *) &server_addr) != -1) {
         LOG_INFO("Server found. IP address of server is %s", inet_ntoa(server_addr.sin_addr));
-        LOG_INFO("Initiating as client.");
+        LOG_INFO("Initializing as client.");
         idobata_client((struct sockaddr *) &server_addr, "shouth");
     } else {
         LOG_INFO("Cannot find server.");
-        LOG_INFO("Initiating as server.");
+        LOG_INFO("Initializing as server.");
         idobata_server(50001, 10, "server");
     }
 }
