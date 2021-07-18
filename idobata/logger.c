@@ -80,11 +80,11 @@ void idobata_log(log_level level, const char *filename, int linenum, const char 
         break;
 
     case INFO:
-        printf("%s%s", ansi_fg_bright_green(), "INFO ");
+        printf("%s%s", ansi_fg_bright_green(), "INFO");
         break;
 
     case WARN:
-        printf("%s%s", ansi_fg_bright_yellow(), "WARN ");
+        printf("%s%s", ansi_fg_bright_yellow(), "WARN");
         break;
 
     case ERROR:

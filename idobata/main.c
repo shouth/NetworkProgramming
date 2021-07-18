@@ -22,14 +22,14 @@ static void show_help(const char *command_name)
         "A communication system for education purposes.\n"
         "\n"
         "USAGE\n"
-        "  %s -u <user-name> [-p <port-number>] [-l <log-level>] [-C] [-h]\n"
+        "  %s -u <user-name> [-p <port-number>] [-l <log-level>] [-c] [-h]\n"
         "\n"
         "OPTIONS\n"
-        "  -u <user-name>    User name\n"
-        "  -p <port-number>  Port number of server. Default to 50001\n"
-        "  -l <log-level>    Log level. Default to INFO\n"
-        "  -C                Disable output color\n"
-        "  -h                Show this help\n"
+        "  -u <user-name>       User name\n"
+        "  -p <port-number>     Port number of server. Default to 50001\n"
+        "  -l <log-level>       Log level. Default to INFO\n"
+        "  -c                   Disable output color\n"
+        "  -h                   Show this help\n"
         , command_name);
 }
 
@@ -88,7 +88,7 @@ static int idobata_lookup(in_port_t port, struct sockaddr *server_addr)
                     close(sock);
                     return 0;
                 } else {
-                    LOG_DEBUG("Server responded, but payload is ill-formed.");
+                    LOG_DEBUG("Server responded, but responce is ill-formed.");
                 }
             }
         } else {
@@ -107,20 +107,20 @@ int main(int argc, char **argv)
     int init_username = 0;
 
     int opt;
-    while ((opt = getopt(argc, argv, "u:p:l:Ch")) != -1) {
+    while ((opt = getopt(argc, argv, "u:p:l:ch")) != -1) {
         switch (opt) {
-        case 'C':
+        case 'c':
             idobata_log_colored(0);
             break;
 
         case 'l':
-            if (strcmp(optarg, "NONE") == 0 || strcmp(optarg, "none")) idobata_log_level(100);
-            if (strcmp(optarg, "FATAL") == 0 || strcmp(optarg, "fatal")) idobata_log_level(FATAL);
-            if (strcmp(optarg, "ERROR") == 0 || strcmp(optarg, "error")) idobata_log_level(ERROR);
-            if (strcmp(optarg, "WARN") == 0 || strcmp(optarg, "warn")) idobata_log_level(WARN);
-            if (strcmp(optarg, "INFO") == 0 || strcmp(optarg, "info")) idobata_log_level(INFO);
-            if (strcmp(optarg, "DEBUG") == 0 || strcmp(optarg, "debug")) idobata_log_level(DEBUG);
-            if (strcmp(optarg, "TRACE") == 0 || strcmp(optarg, "trace")) idobata_log_level(TRACE);
+            if (strcmp(optarg, "NONE") == 0 || strcmp(optarg, "none") == 0) idobata_log_level(100);
+            if (strcmp(optarg, "FATAL") == 0 || strcmp(optarg, "fatal") == 0) idobata_log_level(FATAL);
+            if (strcmp(optarg, "ERROR") == 0 || strcmp(optarg, "error") == 0) idobata_log_level(ERROR);
+            if (strcmp(optarg, "WARN") == 0 || strcmp(optarg, "warn") == 0) idobata_log_level(WARN);
+            if (strcmp(optarg, "INFO") == 0 || strcmp(optarg, "info") == 0) idobata_log_level(INFO);
+            if (strcmp(optarg, "DEBUG") == 0 || strcmp(optarg, "debug") == 0) idobata_log_level(DEBUG);
+            if (strcmp(optarg, "TRACE") == 0 || strcmp(optarg, "trace") == 0) idobata_log_level(TRACE);
             break;
 
         case 'u':
