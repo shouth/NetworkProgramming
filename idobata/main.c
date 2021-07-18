@@ -14,6 +14,7 @@
 #include "idobata_server.h"
 
 #define BUFSIZE 1024
+#define TIMEOUT_SEC 5
 
 static void show_help(const char *command_name)
 {
@@ -31,13 +32,6 @@ static void show_help(const char *command_name)
         "  -c                   Disable output color\n"
         "  -h                   Show this help\n"
         , command_name);
-}
-
-static int idobata_helo(int sock, struct sockaddr *addr)
-{
-    char buf[BUFSIZE];
-    size_t strsize = snprintf(buf, BUFSIZE, "HELO");
-    Sendto(sock, buf, strsize, 0, addr, sizeof(struct sockaddr));
 }
 
 static int init_broadcast_udpclient(in_addr_t addr, in_port_t port, struct sockaddr_in *ret)
@@ -65,17 +59,16 @@ static int idobata_lookup(in_port_t port, struct sockaddr *server_addr)
     FD_ZERO(&mask);
     FD_SET(sock, &mask);
 
-    struct timeval timeout;
-
     char buf[BUFSIZE];
 
     for (size_t i = 0; i < 3; i++) {
         LOG_DEBUG("[%d/3] Finding server...", i + 1);
 
-        idobata_helo(sock, (struct sockaddr *) &broadcast_addr);
+        size_t strsize = snprintf(buf, BUFSIZE, "HELO");
+        Sendto(sock, buf, strsize, 0, (struct sockaddr *) &broadcast_addr, sizeof(struct sockaddr));
 
         readfds = mask;
-        timeout.tv_sec = 1, timeout.tv_usec = 0;
+        struct timeval timeout = { .tv_sec = TIMEOUT_SEC, .tv_usec = 0 };
 
         if (select(sock + 1, &readfds, NULL, NULL, &timeout) != 0) {
             if (FD_ISSET(sock, &readfds)) {
@@ -124,6 +117,10 @@ int main(int argc, char **argv)
             break;
 
         case 'u':
+            if (strlen(optarg) > 15) {
+                LOG_ERROR("User name needs to be less than or equal to 15 characters.");
+                exit(EXIT_FAILURE);
+            }
             strncpy(username, optarg, sizeof(username));
             init_username = 1;
             break;
@@ -143,8 +140,7 @@ int main(int argc, char **argv)
         exit(EXIT_FAILURE);
     }
 
-    LOG_INFO("Educational Idobata System");
-    LOG_INFO("Written by Shota Minami <b9122051@edu.kit.ac.jp>");
+    LOG_INFO("Educational Idobata Communication System");
 
     LOG_INFO("Finding server...");
     struct sockaddr_in server_addr;

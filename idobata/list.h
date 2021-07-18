@@ -33,4 +33,9 @@ static void list_remove(list_node *node)
 #define list_for(ptr, head) \
     for (ptr = (head)->next; ptr != (head); ptr = ptr->next)
 
+#define list_for_each(ptr, head, type, member) \
+    for (ptr = list_entry((head)->next, type, member); \
+        &ptr->member != (head); \
+        ptr = list_entry(ptr->member.next, type, member))
+
 #endif

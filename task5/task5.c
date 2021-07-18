@@ -44,7 +44,7 @@ void set_sockaddr_in_broadcast(struct sockaddr_in *server_adrs, in_port_t port_n
     server_adrs->sin_addr.s_addr = htonl(INADDR_BROADCAST);
 }
 
-int init_broadcast_udpclient(struct sockaddr_in *adrs, in_port_t port)
+int init_broadcast_udpclient(struct sockaddr_in *adrs)
 {
     int broadcast_sw = 1;
     int sock = init_udpclient();
@@ -66,7 +66,7 @@ int init_tcpclient_sockaddr(const struct sockaddr *addr, size_t len)
     return sock;
 }
 
-int find_server(in_port_t port, const char *user_name)
+int idobata_lookup(in_port_t port, const char *user_name)
 {
     struct sockaddr_in broadcast_adrs;
     struct sockaddr_in server_addr;
@@ -80,7 +80,7 @@ int find_server(in_port_t port, const char *user_name)
     int i;
 
     set_sockaddr_in_broadcast(&broadcast_adrs, port);
-    sock = init_broadcast_udpclient(&broadcast_adrs, port);
+    sock = init_broadcast_udpclient(&broadcast_adrs);
 
     FD_ZERO(&mask);
     FD_SET(sock, &mask);
@@ -157,7 +157,7 @@ int main(int argc, char *argv[])
     }
 
     port = argc > 2 ? atoi(argv[2]) : 50001;
-    sock = find_server(port, user_name);
+    sock = idobata_lookup(port, user_name);
 
     FD_ZERO(&mask);
     FD_SET(sock, &mask);
