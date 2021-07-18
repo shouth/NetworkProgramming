@@ -6,7 +6,7 @@
 #include "logger.h"
 
 
-static log_level threshold = WARN;
+static log_level threshold = INFO;
 void idobata_log_level(log_level level) { threshold = level; }
 
 
@@ -72,27 +72,27 @@ void idobata_log(log_level level, const char *filename, int linenum, const char 
 
     switch (level) {
     case TRACE:
-        printf("%s%-5s", ansi_reset(), "TRACE");
+        printf("%s%s", ansi_fg_bright_white(), "TRACE");
         break;
 
     case DEBUG:
-        printf("%s%-5s", ansi_fg_cyan(), "DEBUG");
+        printf("%s%s", ansi_fg_bright_cyan(), "DEBUG");
         break;
 
     case INFO:
-        printf("%s%-5s", ansi_fg_green(), "INFO");
+        printf("%s%s", ansi_fg_bright_green(), "INFO ");
         break;
 
     case WARN:
-        printf("%s%-5s", ansi_fg_yellow(), "WARN");
+        printf("%s%s", ansi_fg_bright_yellow(), "WARN ");
         break;
 
     case ERROR:
-        printf("%s%-5s", ansi_fg_red(), "ERROR");
+        printf("%s%s", ansi_fg_bright_red(), "ERROR");
         break;
 
     case FATAL:
-        printf("%s%-5s", ansi_fg_magenta(), "FATAL");
+        printf("%s%s", ansi_fg_bright_magenta(), "FATAL");
         break;
     }
     printf("%s", ansi_reset());
