@@ -70,7 +70,7 @@ static int idobata_lookup(in_port_t port, struct sockaddr *server_addr)
     char buf[BUFSIZE];
 
     for (size_t i = 0; i < 3; i++) {
-        LOG_DEBUG("[%d/3] Trying to find server...", i + 1);
+        LOG_DEBUG("[%d/3] Finding server...", i + 1);
 
         idobata_helo(sock, (struct sockaddr *) &broadcast_addr);
 
