@@ -97,7 +97,7 @@ int idobata_server(in_port_t port, size_t capacity, const char *username)
             size_t strsize = strlen(buf) - 1;
             buf[strsize] = '\0';
 
-            LOG_DEBUG("Message: %s", buf);
+            LOG_TRACE("Message: %s", buf);
 
             idobata_mesg(head, head, buf, strsize);
         }
@@ -110,7 +110,7 @@ int idobata_server(in_port_t port, size_t capacity, const char *username)
             size_t strsize = Recvfrom(udp_sock, buf, BUFSIZE - 1, 0, (struct sockaddr *) &addr, &from_len);
             buf[strsize] = '\0';
 
-            LOG_DEBUG("Message: %s", buf);
+            LOG_TRACE("Message: %s", buf);
 
             if (strncmp(buf, "HELO", 4) == 0) idobata_here(udp_sock, &addr);
         }
@@ -140,7 +140,7 @@ int idobata_server(in_port_t port, size_t capacity, const char *username)
                 ssize_t strsize = recv(info->sock, buf, BUFSIZE - 1, 0);
                 buf[strsize] = '\0';
 
-                LOG_DEBUG("Message: %s", buf);
+                LOG_TRACE("Message: %s", buf);
 
                 if (strncmp(buf, "JOIN", 4) == 0) {
                     idobata_join(node, buf);

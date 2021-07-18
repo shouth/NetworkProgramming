@@ -67,14 +67,14 @@ int idobata_client(struct sockaddr *server_addr, const char *username)
             LOG_DEBUG("Message received from stdio.");
 
             if (fgets(buf, BUFSIZE - 1, stdin) == NULL) {
-                LOG_DEBUG("Input is empty.");
+                LOG_TRACE("Input is empty.");
                 idobata_quit(sock);
                 LOG_INFO("Good-bye.");
                 exit(EXIT_SUCCESS);
             } else {
                 size_t strsize = strcspn(buf, "\r\n");
                 buf[strsize] = '\0';
-                LOG_DEBUG("Input: %s", buf);
+                LOG_TRACE("Input: %s", buf);
 
                 if (strcmp(buf, "QUIT") == 0) {
                     idobata_quit(sock);
@@ -89,13 +89,13 @@ int idobata_client(struct sockaddr *server_addr, const char *username)
 
             ssize_t strsize;
             if ((strsize = recv(sock, buf, BUFSIZE - 1, 0)) == 0) {
-                LOG_DEBUG("Message is empty.");
+                LOG_TRACE("Message is empty.");
                 LOG_INFO("Server closed connection.");
                 LOG_INFO("Good-bye.");
                 exit(EXIT_SUCCESS);
             } else {
                 buf[strsize] = '\0';
-                LOG_DEBUG("Message: %s", buf);
+                LOG_TRACE("Message: %s", buf);
 
                 if (strncmp(buf, "MESG", 4) == 0) {
                     idobata_mesg(buf);
